@@ -39,5 +39,5 @@ build/
 .DS_Store
 
 dataset/
-painting-classifier-model.zip
-*.zip
+
+

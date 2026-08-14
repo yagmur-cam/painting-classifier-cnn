@@ -40,7 +40,7 @@ public class Evaluator {
         INDArray output = model.output(image);
         double[] probs = new double[7];
         for (int i = 0; i < 7; i++) {
-            probs[i] = output.getDouble(i);
+            probs[i] = output.getDouble(0, i);
         }
         return probs;
     }

@@ -41,7 +41,7 @@ public class DataLoader {
         if (splitFolder.equals("train")) {
             ImageTransform flipTransform = new FlipImageTransform(1);
             ImageTransform rotateTransform = new RotateImageTransform(15);
-            ImageTransform cropTransform = new RandomCropTransform(200, 200);
+            ImageTransform cropTransform = new RandomCropTransform(120, 120);
             List<Pair<ImageTransform, Double>> transforms = new ArrayList<>();
             transforms.add(new Pair<>(flipTransform, 0.5));
             transforms.add(new Pair<>(rotateTransform, 0.5));

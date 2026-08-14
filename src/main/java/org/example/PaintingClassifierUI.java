@@ -6,16 +6,16 @@ import java.awt.*;
 public class PaintingClassifierUI extends JFrame {
     private static final String[] STYLES = {
                 "Baroque", "Cubism", "Expressionism", "Impressionism",
-            "Romanticism", "Surrealism", "Renaissance"
+            "Renaissance", "Romanticism", "Surrealism"
     };
     private static final String[] STYLE_DESCRIPTIONS = {
             "Dramatic contrast between light and shadow, rich deep colors, 17th century European art.",
             "Geometric fragmentation, no deep shadows or gradients indicating 3D depth, early 20th century.",
             "Distorted forms, abnormal colors, emotional intensity, early 20th century.",
             "Visible brushstrokes,  pure color sitting next to each other rather than blended, natural light, late 19th century French.",
+            "Smooth blending, dark backgrounds, religious compositions, 14th-17th century.",
             "Dramatic landscapes against tiny human figures, emotional subjects, early 19th century.",
             "Technically realistic but impossible imagery, 20th century movement.",
-            "Smooth blending, dark backgrounds, religious compositions, 14th-17th century."
     };
 
     public PaintingClassifierUI() {

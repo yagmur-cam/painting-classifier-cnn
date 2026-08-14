@@ -25,6 +25,7 @@ public class Trainer {
         }
         ModelSerializer.writeModel(model, new File("painting-classifier-model.zip"), true);
         System.out.println("Training complete. Model saved.");
+        testIterator.reset();
         Evaluation testEval = model.evaluate(testIterator);
         System.out.println("Test Accuracy: " + testEval.accuracy());
         System.out.println(testEval.stats());
