@@ -6,6 +6,8 @@ from PIL import Image
 from PIL import ImageOps
 import imagehash
 
+random.seed(42)
+
 #Split all 7 styles into train/val/test
 BASE = os.path.dirname(os.path.abspath(__file__))
 SOURCE = os.environ.get("PAINTING_SOURCE", os.path.join(BASE, "raw"))
