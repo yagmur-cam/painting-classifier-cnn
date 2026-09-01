@@ -20,13 +20,12 @@ public class PaintingClassifierUI extends JFrame {
 
     public PaintingClassifierUI() {
         setTitle("Painting Style Classifier");
-        setSize(700, 580);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         getContentPane().setBackground(Color.WHITE);
 
         JButton uploadButton = new JButton("Upload Painting");
-        uploadButton.setBackground(new Color(30, 158, 117));
+        uploadButton.setBackground(new Color(142, 45, 68));
         uploadButton.setForeground(Color.WHITE);
         uploadButton.setFocusPainted(false);
         uploadButton.setBorderPainted(false);
@@ -36,6 +35,8 @@ public class PaintingClassifierUI extends JFrame {
         JLabel imageLabel = new JLabel("No image selected", JLabel.CENTER);
         imageLabel.setBackground(new Color(245, 244, 240));
         imageLabel.setOpaque(true);
+        imageLabel.setPreferredSize(new Dimension(420, 420));
+
 
         JLabel resultLabel = new JLabel("Predicted style will appear here", JLabel.CENTER);
         JLabel confidenceLabel = new JLabel("Confidence will appear here", JLabel.CENTER);
@@ -44,7 +45,7 @@ public class PaintingClassifierUI extends JFrame {
 
         resultLabel.setFont(new Font("SansSerif", Font.BOLD, 15));
         confidenceLabel.setFont(new Font("SansSerif", Font.PLAIN, 13));
-        confidenceLabel.setForeground(new Color(15, 110, 86));
+        confidenceLabel.setForeground(new Color(104, 32, 50));
         top3Label.setFont(new Font("SansSerif", Font.PLAIN, 12));
         top3Label.setForeground(new Color(100, 100, 100));
         infoLabel.setFont(new Font("SansSerif", Font.ITALIC, 12));
@@ -56,8 +57,11 @@ public class PaintingClassifierUI extends JFrame {
             int result = fileChooser.showOpenDialog(this);
             if (result == JFileChooser.APPROVE_OPTION) {
                 String imagePath = fileChooser.getSelectedFile().getAbsolutePath();
-                ImageIcon icon = new ImageIcon(new ImageIcon(imagePath)
-                        .getImage().getScaledInstance(300, 300, Image.SCALE_SMOOTH));
+                ImageIcon raw = new ImageIcon(imagePath);
+                int w = raw.getIconWidth(), h = raw.getIconHeight();
+                double scale = 400.0 / Math.max(w, h);
+                ImageIcon icon = new ImageIcon(raw.getImage()
+                        .getScaledInstance((int)(w * scale), (int)(h * scale), Image.SCALE_SMOOTH));
                 imageLabel.setIcon(icon);
                 imageLabel.setText("");
                 try {
@@ -107,6 +111,7 @@ public class PaintingClassifierUI extends JFrame {
         bottomPanel.add(top3Label);
         bottomPanel.add(infoLabel);
         add(bottomPanel, BorderLayout.SOUTH);
+        pack();
         setVisible(true);
     }
 

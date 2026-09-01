@@ -67,6 +67,11 @@ it by running `dataset_prep/prep_data.py`, which handles the whole pipeline:
 
 Requires `requests`, `Pillow` and `imagehash`.
 
+- The split is seeded (`random.seed(42)`) so the partition is reproducible.
+Note that the included model was trained before seeding was added, so its
+exact split can't be reconstructed, retraining from a fresh run of the
+script will produce slightly different numbers.
+
 
 ## Architecture
 
@@ -102,34 +107,61 @@ A CNN built from scratch in DL4J, no pretrained weights or transfer learning.
 
 
 
-
 ## Results
-Accuracy / precision / recall / F1 table, then the confusion matrix.
-Then a short paragraph on *what the errors mean* — Surrealism is
-weakest, Baroque↔Romanticism confusion, Renaissance→Baroque. Point out
-these are art-historically adjacent styles.
+Evaluated on the held-out test set (2,252 images):
 
+```
+========================Evaluation Metrics========================
+ # of classes:    7
+ Accuracy:        0.5138
+ Precision:       0.5121
+ Recall:          0.5154
+ F1 Score:        0.5083
+Precision, recall & F1: macro-averaged (equally weighted avg. of 7 classes)
+```
+Random guessing across seven balanced classes would give 14.3%.
 
-
+Rows are the true style, columns the prediction:
 ```
 =========================Confusion Matrix=========================
-0   1   2   3   4   5   6
+   0   1   2   3   4   5   6
 -----------------------------
-198   2   7   7  26  61   9 | 0 = Baroque
-7 180  60  19  14   6  34 | 1 = Cubism
-13  62 130  53  22  21  23 | 2 = Expressionism
-12   7  26 220  10  40   8 | 3 = Impressionism
-52   3  25  24 189  15   9 | 4 = Renaissance
-74   1  18  53  33 140  14 | 5 = Romanticism
-18  85  52  28  12  30 100 | 6 = Surrealism
+ 198   2   7   7  26  61   9 | 0 = Baroque
+   7 180  60  19  14   6  34 | 1 = Cubism
+  13  62 130  53  22  21  23 | 2 = Expressionism
+  12   7  26 220  10  40   8 | 3 = Impressionism
+  52   3  25  24 189  15   9 | 4 = Renaissance
+  74   1  18  53  33 140  14 | 5 = Romanticism
+  18  85  52  28  12  30 100 | 6 = Surrealism
+
+Confusion matrix format: Actual (rowClass) predicted as (columnClass) N times
+==================================================================
 ```
 
 
+The errors are not random. Almost every major confusion falls between styles
+that are adjacent in art history:
+
+- **Surrealism is weakest** (100/325 correct), with 85 images going to Cubism
+  and 52 to Expressionism. This class came from a different source than the
+  rest and is stylistically the broadest; Chagall, Arp and Dalí share a label
+  but little visual vocabulary.
+- **Baroque and Romanticism trade heavily in both directions** (74 and 61).
+  Both favour dark palettes, dramatic lighting and overlapping subject matter.
+- **Renaissance is most often mistaken for Baroque** (52), which is the
+  neighbouring period with similar religious composition.
+- **Impressionism is strongest** (220/323). Visible brushwork is a distinctive
+  texture that a convolutional network picks up easily.
+
+That the confusions cluster around genuine art historical boundaries suggests
+the network learned something about style rather than memorising artefacts of
+the dataset.
 
 
 ## Setup and Usage
 
-Requires Java 11+ and Maven, Python for the dataset preparation. CPU-only — no GPU needed.
+Requires Java 11+, Maven, and Python 3 for dataset preparation. CPU only, no
+GPU needed. If Maven isn't on your PATH, use IntelliJ's Maven panel instead.
 
 ```bash
 git clone https://github.com/yagmur-cam/painting-classifier-cnn.git
@@ -138,7 +170,7 @@ mvn compile
 ```
 
 The trained model is included, so you can predict or evaluate immediately.
-To train from scratch you need the dataset — see below.
+To train from scratch you need the dataset; see above.
 
 | Command | What it does |
 |---|---|
@@ -147,10 +179,6 @@ To train from scratch you need the dataset — see below.
 | `mvn exec:java -Dexec.args="evaluate"` | Score the test set |
 | `mvn exec:java -Dexec.args="train"` | Retrain (several hours on CPU) |
 
-## How to Run
-1. Clone the repository
-2. Add dataset folder to project root (not included in repo — """""""""")
-3. Run Trainer.java
 
 ## Project structure
 ```
@@ -189,7 +217,28 @@ painting-classifier-cnn/
 
 
 
+## Limitations and future work
 
-## Limitations & future work
-Curve was still climbing at epoch 30; no transfer learning;
-style boundaries are inherently fuzzy.
+**Training had not converged.** Validation accuracy was still climbing at epoch
+30 (0.52 → 0.535 over the final few epochs) and test accuracy sat below
+validation, so the model was not overfitting. More epochs would likely gain
+several points.
+
+**No transfer learning.** The network is trained from scratch on ~10,000 training images. 
+Fine-tuning a pretrained ResNet or VGG on the same data would almost
+certainly perform substantially better, since low-level visual features
+transfer well. Building the architecture from nothing was the point here, but
+it caps what the accuracy can be.
+
+**Style labels are inherently fuzzy.** Movements overlap, artists work across
+them, and a single painting can reasonably belong to two categories. Some
+proportion of the remaining error is disagreement that art historians would
+also have.
+
+**Small input resolution.** 128×128 discards fine brushwork detail that is
+often exactly what distinguishes one style from another. Higher resolution
+would help but costs training time on CPU.
+
+Possible next steps: longer training with early stopping, a pretrained
+backbone, higher input resolution, and per-class threshold tuning for
+Surrealism.
